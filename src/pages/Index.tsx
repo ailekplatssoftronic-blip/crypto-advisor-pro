@@ -1,45 +1,51 @@
-import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { BitcoinHero } from '@/components/BitcoinHero';
 import { StockCard } from '@/components/StockCard';
 import { RecommendationSummary } from '@/components/RecommendationSummary';
-import { bitcoinData, stocksData, cryptoRelatedStocks } from '@/data/mockData';
+import { useRecommendations } from '@/hooks/useRecommendations';
 import { toast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, isLoading, refetch, isFetching } = useRecommendations();
 
-  const handleRefresh = () => {
-    setIsLoading(true);
+  const handleRefresh = async () => {
     toast({
-      title: "Daten werden aktualisiert...",
-      description: "Die neuesten Marktdaten werden geladen.",
+      title: "Refreshing data...",
+      description: "Loading latest market data.",
     });
     
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Daten aktualisiert",
-        description: "Alle Kurse sind auf dem neuesten Stand.",
-      });
-    }, 1500);
+    await refetch();
+    
+    toast({
+      title: "Data updated",
+      description: "All prices are up to date.",
+    });
   };
 
-  const allStocks = [...stocksData, ...cryptoRelatedStocks];
+  const allStocks = [...(data?.stocks || []), ...(data?.cryptoRelated || [])];
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-7xl mx-auto px-4 pb-12">
-        <Header onRefresh={handleRefresh} isLoading={isLoading} />
+        <Header onRefresh={handleRefresh} isLoading={isFetching} />
 
         {/* Bitcoin Hero Section */}
         <section className="mb-10">
-          <BitcoinHero data={bitcoinData} />
+          {isLoading ? (
+            <Skeleton className="h-64 w-full rounded-xl" />
+          ) : data?.bitcoin ? (
+            <BitcoinHero data={data.bitcoin} />
+          ) : null}
         </section>
 
         {/* Recommendation Summary */}
         <section className="mb-10">
-          <RecommendationSummary stocks={allStocks} />
+          {isLoading ? (
+            <Skeleton className="h-32 w-full rounded-xl" />
+          ) : (
+            <RecommendationSummary stocks={allStocks} />
+          )}
         </section>
 
         {/* Bitcoin-Related Stocks */}
@@ -49,9 +55,15 @@ const Index = () => {
             <h2 className="text-xl font-bold text-foreground">Bitcoin Mining & Holdings</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stocksData.map((stock, index) => (
-              <StockCard key={stock.symbol} stock={stock} index={index} />
-            ))}
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-xl" />
+              ))
+            ) : (
+              data?.stocks.map((stock, index) => (
+                <StockCard key={stock.symbol} stock={stock} index={index} />
+              ))
+            )}
           </div>
         </section>
 
@@ -59,23 +71,29 @@ const Index = () => {
         <section className="mb-10">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-6 bg-success rounded-full" />
-            <h2 className="text-xl font-bold text-foreground">Krypto-bezogene Aktien</h2>
+            <h2 className="text-xl font-bold text-foreground">Crypto-Related Stocks</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cryptoRelatedStocks.map((stock, index) => (
-              <StockCard key={stock.symbol} stock={stock} index={index + stocksData.length} />
-            ))}
+            {isLoading ? (
+              Array.from({ length: 2 }).map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full rounded-xl" />
+              ))
+            ) : (
+              data?.cryptoRelated.map((stock, index) => (
+                <StockCard key={stock.symbol} stock={stock} index={index + (data?.stocks.length || 0)} />
+              ))
+            )}
           </div>
         </section>
 
         {/* Disclaimer */}
         <footer className="text-center py-8 border-t border-border">
           <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-            <strong>Haftungsausschluss:</strong> Diese Anwendung dient nur zu Informationszwecken und stellt keine Anlageberatung dar. 
-            Investitionen in Kryptowährungen und Aktien sind mit Risiken verbunden. Bitte konsultieren Sie einen Finanzberater vor Anlageentscheidungen.
+            <strong>Disclaimer:</strong> This application is for informational purposes only and does not constitute investment advice. 
+            Investments in cryptocurrencies and stocks involve risks. Please consult a financial advisor before making investment decisions.
           </p>
           <p className="text-xs text-muted-foreground mt-4">
-            Datenquelle: Demo-Daten • Letzte Aktualisierung: {new Date().toLocaleString('de-DE')}
+            Data source: Database • Last updated: {new Date().toLocaleString('en-US')}
           </p>
         </footer>
       </div>
