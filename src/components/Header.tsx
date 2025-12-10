@@ -15,14 +15,14 @@ export const Header = ({ onRefresh, isLoading }: HeaderProps) => {
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">CryptoStock Analyzer</h1>
-          <p className="text-xs text-muted-foreground">Bitcoin & Krypto-Aktien Empfehlungen</p>
+          <p className="text-xs text-muted-foreground">Bitcoin & Crypto Stock Recommendations</p>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
         <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
           <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span>Live-Daten</span>
+          <span>Live Data</span>
         </div>
         <Button
           variant="outline"
@@ -32,7 +32,7 @@ export const Header = ({ onRefresh, isLoading }: HeaderProps) => {
           className="gap-2"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">Aktualisieren</span>
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
     </header>
