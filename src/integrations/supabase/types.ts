@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      recommendations: {
+        Row: {
+          asset_type: string
+          change: number
+          change_percent: number
+          created_at: string
+          day_high: number | null
+          day_low: number | null
+          id: string
+          market_cap: string | null
+          name: string
+          price: number
+          recommendation: string
+          symbol: string
+          updated_at: string
+          volume: number | null
+        }
+        Insert: {
+          asset_type?: string
+          change: number
+          change_percent: number
+          created_at?: string
+          day_high?: number | null
+          day_low?: number | null
+          id?: string
+          market_cap?: string | null
+          name: string
+          price: number
+          recommendation: string
+          symbol: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Update: {
+          asset_type?: string
+          change?: number
+          change_percent?: number
+          created_at?: string
+          day_high?: number | null
+          day_low?: number | null
+          id?: string
+          market_cap?: string | null
+          name?: string
+          price?: number
+          recommendation?: string
+          symbol?: string
+          updated_at?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
